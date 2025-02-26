@@ -1,10 +1,5 @@
-all: main
-
-main:
-	g++ main.cpp algos/* -o build/main
-
-run: main
-	./build/main
+default:
+	g++ main.cpp lib/* algos/* -o main
 
 clean:
-	rm ./build/main
+	rm ./main

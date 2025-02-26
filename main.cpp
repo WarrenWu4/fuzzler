@@ -1,61 +1,10 @@
+#include <queue>
 #include <string>
-#include <filesystem>
 #include <iostream>
 #include <utility>
 #include <vector>
 #include "algos/levenshteinDistance.h"
-
-std::vector<std::string> pathSplit(std::string path) {
-    std::vector<std::string> words;
-    std::string word = "";
-    for (char c : path) {
-        if (c == '/' || c == '\\') {
-            if (word != "") {
-                words.push_back(word);
-                word = "";
-            }
-        } else {
-            word += c;
-        }
-    }
-    if (word != "") {
-        words.push_back(word);
-    }
-    return words;
-}
-
-int maxPathScore(std::string query, std::string path) {
-    LevenshteinDistance ld;
-    // break path down into words
-    std::vector<std::string> pathWords = pathSplit(path);
-    int maxScore = 0;
-    // get score of each word
-    for (int i = 0; i < pathWords.size(); i++) {
-        maxScore = std::max(maxScore, ld.score(query, pathWords[i]));
-    }
-    // return max score
-    return maxScore;
-}
-
-void recurseFile(std::string query, const std::filesystem::path& directory, int maxDepth, std::vector<std::pair<std::string, int>> &results,  int currentDepth=0) {
-    if (currentDepth > maxDepth) {
-        return;
-    }
-    // score similarity of file name based on input
-    // use different algorithm based on input flag
-    // print out top 20 results
-    for (const auto& entry : std::filesystem::directory_iterator(directory)) {
-        if (entry.is_regular_file()) {
-            std::string path = entry.path().string();
-            results.push_back(
-                std::make_pair(path, maxPathScore(query, path))
-            );
-        } else if (entry.is_directory()) {
-            std::cout << entry.path() << std::endl;
-            recurseFile(query, entry.path(), maxDepth, results, currentDepth + 1);
-        }
-    }
-}
+#include "lib/helper.h"
 
 int main(int argc, char* argv[]) {
     // input arguments
@@ -65,20 +14,37 @@ int main(int argc, char* argv[]) {
     }
     std::string query = argv[1];
 
+    Helper h;
+    LevenshteinDistance ld;
+
     // set max depth level
     const int MAX_DEPTH = 50;
-    // for each directory level
-    std::string dir = ".";
-    // top 20 results
+
+    std::queue<std::string> dirs;
+    dirs.push(".");
     std::vector<std::pair<std::string, int>> results;
-    try {
-        recurseFile(query, dir, MAX_DEPTH, results);
-    } catch (const std::filesystem::filesystem_error& e) {
-        std::cerr << e.what() << std::endl;
+
+    for(int i = 0; i < MAX_DEPTH && !dirs.empty(); i++) {
+        std::string dirName = dirs.front();
+        std::vector<std::pair<std::string, FileType>> res = h.filesInDir(dirName);
+        for (std::pair<std::string, FileType> r : res) {
+            int tempScore  = ld.score(h.endFile(r.first), query);
+            results.push_back(std::pair(r.first, tempScore));
+            if (r.second == dir) {
+                dirs.push(r.first);
+            }
+        }
+        dirs.pop();
     }
 
+    // sort and print results
+    std::sort(results.begin(), results.end(), 
+              [](const std::pair<std::string, int>& a, const std::pair<std::string, int>& b) {
+              return a.second < b.second;
+              });
     for (const auto& result : results) {
         std::cout << result.first << " " << result.second << std::endl;
     }
+
     return 0;
 }
