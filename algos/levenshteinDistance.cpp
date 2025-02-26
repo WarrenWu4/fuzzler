@@ -1,8 +1,6 @@
-#include <string>
-#include <algorithm>
-#include <iostream>
+#include "levenshteinDistance.h"
 
-int levenshteinDistance(std::string s1, std::string s2) {
+int LevenshteinDistance::score(std::string s1, std::string s2) {
     const int len1 = s1.length();
     const int len2 = s2.length();
     int prevRow[len2 + 1];
@@ -25,13 +23,5 @@ int levenshteinDistance(std::string s1, std::string s2) {
         }
     }
     return currRow[len2];
-}
-
-int main() {
-    std::string s1 = "begin";
-    std::string s2 = "aegn";
-    int dist = levenshteinDistance(s1, s2);
-    std::cout << dist << "\n";
-    return 0;
 }
 

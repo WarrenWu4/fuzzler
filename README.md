@@ -1,3 +1,3 @@
 # fuzzler
 
-simple fuzzy finder with a couple of different algorithms and languages
+simple fuzzy finder for files and directories using different algorithms
