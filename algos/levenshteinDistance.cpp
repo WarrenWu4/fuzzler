@@ -25,3 +25,7 @@ int LevenshteinDistance::score(std::string s1, std::string s2) {
     return currRow[len2];
 }
 
+float LevenshteinDistance::normalize(int score, int s1Len, int s2Len) {
+    if (s1Len == 0 && s2Len == 0) { return -1.0f; }
+    return 1.0f - (static_cast<double>(score)/std::max(s1Len, s2Len));
+}

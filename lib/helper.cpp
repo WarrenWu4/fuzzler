@@ -28,3 +28,7 @@ std::vector<std::pair<std::string, FileType>> Helper::filesInDir(std::string pat
     return files;
 }
 
+bool Helper::isDirExists(std::string path) {
+    return (std::filesystem::exists(path) && std::filesystem::is_directory(path));
+}
+

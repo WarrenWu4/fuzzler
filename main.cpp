@@ -8,20 +8,25 @@
 
 int main(int argc, char* argv[]) {
     // input arguments
-    if (argc != 2) {
-        std::cerr << "Usage: " << argv[0] << " <query>" << std::endl;
+    if (argc < 3) {
+        std::cerr << "Usage: " << argv[0] << " <query>" << " <starting_dir>" << "\n";
         return 1;
     }
     std::string query = argv[1];
-
+    std::string start_dir = (argc > 3) ? argv[2] : ".";
+    
     Helper h;
     LevenshteinDistance ld;
-
     // set max depth level
     const int MAX_DEPTH = 50;
 
+    // check start_dir is valid
+    if (!h.isDirExists(start_dir)) {
+        std::cerr << "Error: " << start_dir << " is an invalid starting directory" << "\n";
+    }
+
     std::queue<std::string> dirs;
-    dirs.push(".");
+    dirs.push(start_dir);
     std::vector<std::pair<std::string, int>> results;
 
     for(int i = 0; i < MAX_DEPTH && !dirs.empty(); i++) {

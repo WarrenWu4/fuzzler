@@ -16,4 +16,6 @@ public:
     std::string endFile(std::string path);
     // gets all the file names of the given path
     std::vector<std::pair<std::string, FileType>> filesInDir(std::string path);
+    // checks that a path exists and is a directory
+    bool isDirExists(std::string path);
 };
